@@ -1,0 +1,7 @@
+.Rprofile
+*.pdf
+data/
+MEDIPSeq_Prostate.Rproj
+objs/
+renv/
+
