@@ -1,7 +1,7 @@
 {
     "id": "9720E079",
-    "path": null,
-    "project_path": null,
+    "path": "~/Documents/Research/Projects/MEDIPSeq_Prostate/code/qsea.R",
+    "project_path": "code/qsea.R",
     "type": "r_source",
     "hash": "0",
     "contents": "",
@@ -10,14 +10,16 @@
     "source_on_save": false,
     "relative_order": 2,
     "properties": {
-        "tempName": "Untitled1"
+        "tempName": "Untitled1",
+        "cursorPosition": "103,0",
+        "scrollLine": "75"
     },
     "folds": "",
-    "lastKnownWriteTime": 0,
-    "encoding": "",
+    "lastKnownWriteTime": 1620010296,
+    "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1619928065672,
+    "last_content_update": 1620010296570,
     "read_only": false,
     "read_only_alternatives": []
 }

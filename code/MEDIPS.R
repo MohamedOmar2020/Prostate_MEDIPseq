@@ -122,8 +122,12 @@ er = MEDIPS.CpGenrich(file = bam_sgC5mC, BSgenome = BSgenome,
 ###################################################################
 ####################################################################
 ## Annotation of significant windows
+mart <- useMart("ENSEMBL_MART_ENSEMBL")
+
 anno.mart.gene = MEDIPS.getAnnotation(dataset = c("hsapiens_gene_ensembl"),
                                       annotation = c("GENE"))
+Annotation <- get.GRCh.bioMart(genome = c("hg19"), as.granges = TRUE)
+
 anno.mart.gene <- anno.mart.gene$Gene
 mr.edgeR.s.gain.merged = MEDIPS.setAnnotation(regions = mr.edgeR.s.gain.merged, annotation = anno.mart.gene)
 
