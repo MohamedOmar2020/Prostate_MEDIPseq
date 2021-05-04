@@ -24,16 +24,16 @@ Samples <- data.frame(sample_name = c("sgC", "sgPKCI"),
 ## Create qsea set
 qseaSet <- createQseaSet(sampleTable = Samples, 
                       BSgenome = "BSgenome.Hsapiens.UCSC.hg19", 
-                      window_size = 250)
+                      window_size = 400)
 qseaSet
 
 
 ## compute the MeDIP coverage for each window
-qseaSet <- addCoverage(qseaSet, uniquePos = TRUE, paired = FALSE, fragment_length = 76)
+qseaSet <- addCoverage(qseaSet, uniquePos = TRUE, paired = FALSE, fragment_length = 80)
 
 ## Compute CNVs
 qseaSet <- addCNV(qseaSet, file_name = "input_files", window_size=10000, 
-               paired=FALSE, parallel=FALSE, MeDIP=FALSE, fragment_length = 76)
+               paired=FALSE, parallel=FALSE, MeDIP=FALSE, fragment_length = 80)
 
 
 ## Scaling Library Factor
@@ -80,7 +80,7 @@ plotPCA(pca_cgi, bg = col, main="PCA plot based on CpG Island Promoters")
 library(GenomicRanges)
 
 ## Keep only significant windows
-sig=isSignificant(qseaGLM, fdr_th=.01)
+sig <- isSignificant(qseaGLM, fdr_th=.01)
 
 #Annotation <- GRanges(seqinfo(BSgenome.Hsapiens.UCSC.hg19))
 
@@ -90,12 +90,14 @@ sig=isSignificant(qseaGLM, fdr_th=.01)
 #txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 txdb <- makeTxDbFromGFF("./data/ForIndex_hg19/hg19.refGene.gtf", format="gtf", organism = "Homo sapiens")
 
-transcript <-  transcripts(txdb)
+transcript <- transcripts(txdb)
 exon <-  exons(txdb)
 gene <-  genes(txdb)
 Annotation <- list(gene = gene, transcript = transcript, exon = exon)
 
-result=makeTable(qseaSet, 
+#################################
+## Results all (FDR = 0.01)
+result <- makeTable(qseaSet, 
                  glm=qseaGLM, 
                  groupMeans=getSampleGroups(qseaSet), 
                  keep=sig, 
@@ -105,22 +107,46 @@ result=makeTable(qseaSet,
 knitr::kable(head(result))
 
 
+###################################
+## Results by gain vs loss (FDR = 0.1)
 sigList <- list(gain=isSignificant(qseaGLM, fdr_th=.1,direction="gain"),
              loss=isSignificant(qseaGLM, fdr_th=.1,direction="loss"))
 
+result_gain <- makeTable(qseaSet, 
+                    glm=qseaGLM, 
+                    groupMeans=getSampleGroups(qseaSet), 
+                    keep=sigList$gain, 
+                    annotation=Annotation, 
+                    norm_method="beta")
 
+result_loss <- makeTable(qseaSet, 
+                         glm=qseaGLM, 
+                         groupMeans=getSampleGroups(qseaSet), 
+                         keep=sigList$loss, 
+                         annotation=Annotation, 
+                         norm_method="beta")
+
+###################################
+## ROIs stats > all
 roi_stats <- regionStats(qseaSet, subsets=sigList, ROIs=Annotation)
 
 
 
 ts_rel <- roi_stats[,-1]/roi_stats[,1]
 x <- barplot(t(ts_rel)*100,ylab="fraction of ROIs[%]",
-          beside=TRUE, legend=TRUE, 
+        names.arg=rownames(roi_stats), beside=TRUE, legend=TRUE, 
           las=2, args.legend=list(x="topleft"), 
           main="Feature enrichment PRKCI_KO vs WT")
 
+#text(x=x[2,],y=-.15,labels=rownames(ts_rel), xpd=TRUE, srt=30, cex=1, adj=c(1,0))
 
 
+
+########################################
+## Look at genes in DMRs
+
+
+AR <- result_gain[grep("CDKN", result_gain$gene), ]
 
 
 
