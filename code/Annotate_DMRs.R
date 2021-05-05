@@ -9,13 +9,13 @@ library(regioneR)
 ## Load DMRs
 
 # Unique to sgPKCI
-DMRs_sgPKCI_vs_sgC <- read_regions(con = "./MACS/Diff/diff_sgC_vs_sgPRKCI_c1.0_cond2.bed", genome = 'hg19', format = 'bed')
+DMRs_sgPKCI_vs_sgC <- read_regions(con = "./MACS/Diff_cutoff_3/diff_sgC_vs_sgPRKCI_c3.0_cond2.bed", genome = 'hg19', format = 'bed')
 DMRs_sgPKCI_vs_sgC
 
 DMRs_sgPKCI_vs_sgC <- GRanges(DMRs_sgPKCI_vs_sgC)
 
 # Unique to sgC
-DMRs_sgC_vs_sgPKCI <- read_regions(con = "./MACS/Diff/diff_sgC_vs_sgPRKCI_c1.0_cond1.bed", genome = 'hg19', format = 'bed')
+DMRs_sgC_vs_sgPKCI <- read_regions(con = "./MACS/Diff_cutoff_3/diff_sgC_vs_sgPRKCI_c3.0_cond1.bed", genome = 'hg19', format = 'bed')
 DMRs_sgC_vs_sgPKCI
 
 DMRs_sgC_vs_sgPKCI <- GRanges(DMRs_sgC_vs_sgPKCI)
@@ -202,29 +202,6 @@ sgCvs_sgPKCI_score <- plot_numerical(
   x_label = 'sgC')
 
 print(sgCvs_sgPKCI_score)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
