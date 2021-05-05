@@ -13,8 +13,12 @@ scheme <- getScheme()
 scheme$GeneRegionTrack$fill <- "salmon"
 scheme$GeneRegionTrack$col <- NULL
 scheme$GeneRegionTrack$transcriptAnnotation <- "symbol"
+scheme$GdObject$background.title <- "white"
+scheme$GdObject$cex.axis <- 12
 addScheme(scheme, "myScheme")
 options(Gviz.scheme = "myScheme")
+
+
 ############################
 ## Build annotation tracks
 
@@ -36,7 +40,7 @@ gtrack <- GenomeAxisTrack()
 itrack <- IdeogramTrack(genome = "hg19")
 
 # Build genome region track
-grtrack <- GeneRegionTrack(txdb, genome = "hg19", name = "Gene Model")
+grtrack <- GeneRegionTrack(txdb, genome = "hg19")
 
 # Build sequence track
 strack <- SequenceTrack(Hsapiens)
@@ -46,31 +50,37 @@ strack <- SequenceTrack(Hsapiens)
 
 ## First, the bigwig files, converted from bedgraph files generated during peak calling by macs3
 sgC_5mC_BigWig <- import.bw("./MACS/bigwig/sgC_treat_pileup.bw")
-sgC_input_BigWig <- import.bw("./MACS/bigwig/sgC_control_lambda.bw")
+#sgC_input_BigWig <- import.bw("./MACS/bigwig/sgC_control_lambda.bw")
 sgPKCI_5mC_BigWig <- import.bw("./MACS/bigwig/sgPKCI_treat_pileup.bw")
-sgPKCI_input_BigWig <- import.bw("./MACS/bigwig/sgPKCI_control_lambda.bw")
+#sgPKCI_input_BigWig <- import.bw("./MACS/bigwig/sgPKCI_control_lambda.bw")
 
 
-sgC_5mC_BigWig <- DataTrack(range = sgC_5mC_BigWig, genome = "hg19", name = "sgC5mC")
-sgC_input_BigWig <- DataTrack(range = sgC_input_BigWig, genome = "hg19", name = "sgCinput")
-sgPKCI_5mC_BigWig <- DataTrack(range = sgPKCI_5mC_BigWig, genome = "hg19", name = "sgPKCI5mC")
-sgPKCI_input_BigWig <- DataTrack(range = sgPKCI_input_BigWig, genome = "hg19", name = "sgPKCIinput")
+sgC_5mC_BigWig <- DataTrack(range = sgC_5mC_BigWig, genome = "hg19", name = "sgC5mC", fill.histogram = "blue", col.histogram = "blue", cex.sampleNames = 12, type = "histogram")
+#sgC_input_BigWig <- DataTrack(range = sgC_input_BigWig, genome = "hg19", name = "sgCinput")
+sgPKCI_5mC_BigWig <- DataTrack(range = sgPKCI_5mC_BigWig, genome = "hg19", name = "sgPKCI5mC", fill.histogram = "red", col.histogram = "red", cex.sampleNames	= 12, type = "histogram")
+#sgPKCI_input_BigWig <- DataTrack(range = sgPKCI_input_BigWig, genome = "hg19", name = "sgPKCIinput")
 
+#displayPars(sgPKCI_5mC_BigWig)
+#displayPars(sgPKCI_5mC_BigWig)$fill.histogram <- "red"
 
 ## Then the bed files resulting from the differntail methylation analysis using macs3 bdgdiff
 MRs_Common <- "./MACS/Diff_cutoff_3/diff_sgC_vs_sgPRKCI_c3.0_common.bed"
 MRs_sgC <- "./MACS/Diff_cutoff_3/diff_sgC_vs_sgPRKCI_c3.0_cond1.bed"
 MRs_sgPKCI <- "./MACS/Diff_cutoff_3/diff_sgC_vs_sgPRKCI_c3.0_cond2.bed"
 
-MRs_Common <- DataTrack(range = MRs_Common, genome = "hg19", name = "MRs_Common")
-MRs_sgC <- DataTrack(range = MRs_sgC, genome = "hg19", name = "MRs_sgC")
-MRs_sgPKCI <- DataTrack(range = MRs_sgPKCI, genome = "hg19", name = "MRs_sgPKCI")
+MRs_Common <- DataTrack(range = MRs_Common, genome = "hg19", name = "MRs_Common", cex.sampleNames	= 12)
+MRs_sgC <- DataTrack(range = MRs_sgC, genome = "hg19", name = "MRs_sgC", cex.sampleNames	= 12)
+MRs_sgPKCI <- DataTrack(range = MRs_sgPKCI, genome = "hg19", name = "MRs_sgPKCI", size	= 3, col.histogram = "red", fill.histogram = "red", type = "histogram")
 
 
 ##########################################################
-## Plot
-plotTracks(list(grtrack, gtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig), type = "histogram",
-           showSampleNames = TRUE, cex.sampleNames = 0.6,
+## Plotting
+
+## Wnt1
+png(filename = "./figs/wnt1.png", width = 2500, height = 2000, res = 300)
+plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig, MRs_sgPKCI), 
+           #type = "histogram",
+           showSampleNames = TRUE, 
            separator = 1, from = 49369522, to = 49378986,
            #sizes = c(25, 25, 100, 100),
            chromosome = "chr12",
@@ -78,11 +88,14 @@ plotTracks(list(grtrack, gtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig), type = "his
            transcriptAnnotation = "gene",
            #family = "gaussian",
            #evaluation = 50,
-           col.histogram	= c("blue", "red"),
-           fill.histogram	= c("blue", "red"),
-           ylim = c(0, 100)
-)
-
+           #col.histogram	= c("blue", "red"),
+           #fill.histogram	= c("blue", "red"),
+           ylim = c(0, 100),
+           background.title = "white",
+           fontsize = 12,
+           col.title = "black"
+           )
+dev.off()
 
 
 
