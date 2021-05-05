@@ -5,18 +5,19 @@ library(Gviz)
 library(GenomicRanges)
 library(BSgenome.Hsapiens.UCSC.hg19)
 library(GenomicFeatures)
+library(annotatr)
 
 #########
 ## Change the plotting parameters
 getOption("Gviz.scheme")
-scheme <- getScheme()
-scheme$GeneRegionTrack$fill <- "salmon"
-scheme$GeneRegionTrack$col <- NULL
-scheme$GeneRegionTrack$transcriptAnnotation <- "symbol"
-scheme$GdObject$background.title <- "white"
-scheme$GdObject$cex.axis <- 12
-addScheme(scheme, "myScheme")
-options(Gviz.scheme = "myScheme")
+#scheme <- getScheme()
+#scheme$GeneRegionTrack$fill <- "salmon"
+#scheme$GeneRegionTrack$col <- NULL
+#scheme$GeneRegionTrack$transcriptAnnotation <- "symbol"
+# scheme$GdObject$background.title <- "white"
+# scheme$GdObject$cex.axis <- 12
+# addScheme(scheme, "myScheme")
+# options(Gviz.scheme = "myScheme")
 
 
 ############################
@@ -68,8 +69,8 @@ MRs_Common <- "./MACS/Diff_cutoff_3/diff_sgC_vs_sgPRKCI_c3.0_common.bed"
 MRs_sgC <- "./MACS/Diff_cutoff_3/diff_sgC_vs_sgPRKCI_c3.0_cond1.bed"
 MRs_sgPKCI <- "./MACS/Diff_cutoff_3/diff_sgC_vs_sgPRKCI_c3.0_cond2.bed"
 
-MRs_Common <- DataTrack(range = MRs_Common, genome = "hg19", name = "MRs_Common", cex.sampleNames	= 12)
-MRs_sgC <- DataTrack(range = MRs_sgC, genome = "hg19", name = "MRs_sgC", cex.sampleNames	= 12)
+MRs_Common <- DataTrack(range = MRs_Common, genome = "hg19", name = "MRs_Common", size	= 3, col.histogram = "black", fill.histogram = "black", type = "histogram")
+MRs_sgC <- DataTrack(range = MRs_sgC, genome = "hg19", name = "MRs_sgC", size	= 3, col.histogram = "blue", fill.histogram = "blue", type = "histogram")
 MRs_sgPKCI <- DataTrack(range = MRs_sgPKCI, genome = "hg19", name = "MRs_sgPKCI", size	= 3, col.histogram = "red", fill.histogram = "red", type = "histogram")
 
 
@@ -78,7 +79,9 @@ MRs_sgPKCI <- DataTrack(range = MRs_sgPKCI, genome = "hg19", name = "MRs_sgPKCI"
 
 ## Wnt1
 png(filename = "./figs/wnt1.png", width = 2500, height = 2000, res = 300)
-plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig, MRs_sgPKCI), 
+plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig, 
+                #MRs_Common, MRs_sgC, 
+                MRs_sgPKCI), 
            #type = "histogram",
            showSampleNames = TRUE, 
            separator = 1, from = 49369522, to = 49378986,
@@ -96,6 +99,156 @@ plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig, MRs_
            col.title = "black"
            )
 dev.off()
+
+##########
+## CDKN1A
+png(filename = "./figs/CDKN1A.png", width = 2500, height = 2000, res = 300)
+plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig
+                #, MRs_sgPKCI
+                ), 
+           #type = "histogram",
+           showSampleNames = TRUE, 
+           separator = 1, from = 36643047, to = 36655146,
+           #sizes = c(25, 25, 100, 100),
+           chromosome = "chr6",
+           geneSymbols = T,
+           #collapseTranscripts = T,
+           transcriptAnnotation = "gene",
+           #family = "gaussian",
+           #evaluation = 50,
+           #col.histogram	= c("blue", "red"),
+           #fill.histogram	= c("blue", "red"),
+           ylim = c(0, 120),
+           background.title = "white",
+           fontsize = 12,
+           col.title = "black"
+)
+dev.off()
+
+###########
+## ADAMTS1
+png(filename = "./figs/ADAMTS1.png", width = 2500, height = 2000, res = 300)
+plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig
+                #, MRs_sgPKCI
+                ), 
+            #type = "histogram",
+            showSampleNames = TRUE, 
+            separator = 1, from = 28208658, to = 28222312,
+            #sizes = c(25, 25, 100, 100),
+            chromosome = "chr21",
+            geneSymbols = T,
+            #collapseTranscripts = T,
+            transcriptAnnotation = "gene",
+            #family = "gaussian",
+            #evaluation = 50,
+            #col.histogram	= c("blue", "red"),
+            #fill.histogram	= c("blue", "red"),
+            ylim = c(0, 100),
+            background.title = "white",
+            fontsize = 12,
+            col.title = "black"
+            )
+dev.off()
+
+###########
+## TMPRSS2
+png(filename = "./figs/TMPRSS2.png", width = 2500, height = 2000, res = 300)
+plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig
+                #, MRs_sgPKCI
+), 
+#type = "histogram",
+showSampleNames = TRUE, 
+separator = 1, from = 42832634, to = 42887088,
+#sizes = c(25, 25, 100, 100),
+chromosome = "chr21",
+geneSymbols = T,
+#collapseTranscripts = T,
+transcriptAnnotation = "gene",
+#family = "gaussian",
+#evaluation = 50,
+#col.histogram	= c("blue", "red"),
+#fill.histogram	= c("blue", "red"),
+ylim = c(0, 100),
+background.title = "white",
+fontsize = 12,
+col.title = "black"
+)
+dev.off() 
+
+#############
+## NOTCH1
+png(filename = "./figs/NOTCH1.png", width = 2500, height = 2000, res = 300)
+plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig
+                #, MRs_sgPKCI
+), 
+#type = "histogram",
+showSampleNames = TRUE, 
+separator = 1, from = 139383045, to = 139438660,
+#sizes = c(25, 25, 100, 100),
+chromosome = "chr9",
+geneSymbols = T,
+#collapseTranscripts = T,
+transcriptAnnotation = "gene",
+#family = "gaussian",
+#evaluation = 50,
+#col.histogram	= c("blue", "red"),
+#fill.histogram	= c("blue", "red"),
+ylim = c(0, 150),
+background.title = "white",
+fontsize = 12,
+col.title = "black"
+)
+dev.off() 
+
+##############
+## CD44
+png(filename = "./figs/CD44.png", width = 2500, height = 2000, res = 300)
+plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig
+                #, MRs_sgPKCI
+), 
+#type = "histogram",
+showSampleNames = TRUE, 
+separator = 1, from = 35145980, to = 35222353,
+#sizes = c(25, 25, 100, 100),
+chromosome = "chr11",
+geneSymbols = T,
+#collapseTranscripts = T,
+transcriptAnnotation = "gene",
+#family = "gaussian",
+#evaluation = 50,
+#col.histogram	= c("blue", "red"),
+#fill.histogram	= c("blue", "red"),
+ylim = c(0, 100),
+background.title = "white",
+fontsize = 12,
+col.title = "black"
+)
+dev.off() 
+
+#################
+## MTOR
+png(filename = "./figs/MTOR.png", width = 2500, height = 2000, res = 300)
+plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig
+                #, MRs_sgPKCI
+), 
+#type = "histogram",
+showSampleNames = TRUE, 
+separator = 1, from = 11258279, to = 11328780,
+#sizes = c(25, 25, 100, 100),
+chromosome = "chr1",
+geneSymbols = T,
+#collapseTranscripts = T,
+transcriptAnnotation = "gene",
+#family = "gaussian",
+#evaluation = 50,
+#col.histogram	= c("blue", "red"),
+#fill.histogram	= c("blue", "red"),
+ylim = c(0, 80),
+background.title = "white",
+fontsize = 12,
+col.title = "black"
+)
+dev.off() 
 
 
 
