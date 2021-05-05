@@ -1,4 +1,4 @@
-This repository contain the scripts used to analyze the MEDIP-seq data from PKCI KO (sgPKCI) versus WT (sgC) samples from prostate c42b cell line.
+This repository contains the scripts used to analyze the MEDIP-seq data from PKCI KO (sgPKCI) versus WT (sgC) samples from prostate c42b cell line.
 
 - Alignment to hg19: STAR v2.7.8a
 
