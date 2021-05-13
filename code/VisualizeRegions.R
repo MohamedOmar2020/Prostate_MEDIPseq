@@ -237,6 +237,7 @@ separator = 1, from = 11258279, to = 11328780,
 #sizes = c(25, 25, 100, 100),
 chromosome = "chr1",
 geneSymbols = T,
+grid = T,
 #collapseTranscripts = T,
 transcriptAnnotation = "gene",
 #family = "gaussian",
@@ -251,6 +252,57 @@ col.title = "black"
 dev.off() 
 
 
+#################
+## ADCY5
+png(filename = "./figs/ADCY5.png", width = 2500, height = 2000, res = 300)
+plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig
+                #, MRs_sgPKCI
+), 
+#type = "histogram",
+showSampleNames = TRUE, 
+separator = 1, from = 122945725, to = 123167496,
+#sizes = c(25, 25, 100, 100),
+chromosome = "chr3",
+geneSymbols = T,
+grid = T,
+#collapseTranscripts = T,
+transcriptAnnotation = "gene",
+#family = "gaussian",
+#evaluation = 50,
+#col.histogram	= c("blue", "red"),
+#fill.histogram	= c("blue", "red"),
+ylim = c(0, 120),
+background.title = "white",
+fontsize = 12,
+col.title = "black"
+)
+dev.off() 
+
+#################
+## ROBO2
+png(filename = "./figs/ADCY5.png", width = 2500, height = 2000, res = 300)
+plotTracks(list(itrack, gtrack, grtrack, sgC_5mC_BigWig, sgPKCI_5mC_BigWig
+                #, MRs_sgPKCI
+), 
+#type = "histogram",
+showSampleNames = TRUE, 
+separator = 1, from = 122945725, to = 123167496,
+#sizes = c(25, 25, 100, 100),
+chromosome = "chr3",
+geneSymbols = T,
+grid = T,
+#collapseTranscripts = T,
+transcriptAnnotation = "gene",
+#family = "gaussian",
+#evaluation = 50,
+#col.histogram	= c("blue", "red"),
+#fill.histogram	= c("blue", "red"),
+ylim = c(0, 120),
+background.title = "white",
+fontsize = 12,
+col.title = "black"
+)
+dev.off() 
 
 
 

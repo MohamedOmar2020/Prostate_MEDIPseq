@@ -11,36 +11,57 @@ library(regioneR)
 # Unique to sgPKCI
 DMRs_sgPKCI_vs_sgC <- read_regions(con = "./MACS/Diff_cutoff_3/diff_sgC_vs_sgPRKCI_c3.0_cond2.bed", genome = 'hg19', format = 'bed')
 DMRs_sgPKCI_vs_sgC
-
 DMRs_sgPKCI_vs_sgC <- GRanges(DMRs_sgPKCI_vs_sgC)
 
 # Unique to sgC
 DMRs_sgC_vs_sgPKCI <- read_regions(con = "./MACS/Diff_cutoff_3/diff_sgC_vs_sgPRKCI_c3.0_cond1.bed", genome = 'hg19', format = 'bed')
 DMRs_sgC_vs_sgPKCI
-
 DMRs_sgC_vs_sgPKCI <- GRanges(DMRs_sgC_vs_sgPKCI)
+
+DMRs_Common <- read_regions(con = "./MACS/Diff_cutoff_3/diff_sgC_vs_sgPRKCI_c3.0_common.bed", genome = 'hg19', format = 'bed')
+DMRs_Common
+DMRs_Common <- GRanges(DMRs_Common)
 
 ########################################
 ## Annotating Regions
 
 # see available annotations
-builtin_annotations()
+hg19AvailAnn <- builtin_annotations()[grep("hg19", builtin_annotations())]
 
 # Select annotations for intersection with regions
 # Note inclusion of custom annotation, and use of shortcuts
-annots <- c('hg19_cpgs', 'hg19_basicgenes', 'hg19_genes_intergenic',
-           'hg19_genes_intronexonboundaries')
+annots <- c('hg19_cpgs', 
+            'hg19_cpg_islands',
+            'hg19_basicgenes',
+            'hg19_genes_promoters',
+            'hg19_enhancers_fantom',
+            'hg19_lncrna_gencode',
+            'hg19_genes_intergenic',
+            'hg19_genes_cds',
+            'hg19_genes_intronexonboundaries',
+            'hg19_genes_exonintronboundaries'
+            )
 
 # Build the annotations (a single GRanges object)
 annotations <- build_annotations(genome = 'hg19', annotations = annots)
+table(annotations$type)
 
+annList <- as.list(tapply(annotations, annotations$type, "[", simplify=FALSE))
+names(annList) <- gsub("_", " ", gsub("cpg", "CpG",
+                                      gsub("hg19_", "", names(annList))))
+### Add genes
+gnsGR <- genes(TxDb.Hsapiens.UCSC.hg19.knownGene)
+annList$genes <- gnsGR
+
+save(annList, file = "./objs/annListGR.rda")
+
+################################################################
 # Intersect the regions we read in with the annotations
 DMRs_sgPKCI_vs_sgC_annotated <- annotate_regions(
   regions = DMRs_sgPKCI_vs_sgC,
   annotations = annotations,
   ignore.strand = TRUE,
   quiet = FALSE)
-
 # Coerce to a data.frame
 DMRs_sgPKCI_vs_sgC_annotated <- data.frame(DMRs_sgPKCI_vs_sgC_annotated)
 
@@ -50,14 +71,29 @@ DMRs_sgC_vs_sgPKCI_annotated <- annotate_regions(
   annotations = annotations,
   ignore.strand = TRUE,
   quiet = FALSE)
-
 # Coerce to a data.frame
 DMRs_sgC_vs_sgPKCI_annotated <- data.frame(DMRs_sgC_vs_sgPKCI_annotated)
 
+DMRs_Common_Annotated <- annotate_regions(
+  regions = DMRs_Common,
+  annotations = annotations,
+  ignore.strand = TRUE,
+  quiet = FALSE)
+# Coerce to a data.frame
+DMRs_Common_Annotated <- data.frame(DMRs_Common_Annotated)
+
 ############
-# Subset based on a gene symbol, in this case NOTCH1
+# Subset based on a gene symbol: 
+
+# NOTCH1
 notch1_subset <- subset(DMRs_sgPKCI_vs_sgC_annotated, annot.symbol == 'NOTCH1')
 print(head(notch1_subset))
+View(notch1_subset)
+
+# ADAMTS1
+ADAMTS1_subset <- subset(DMRs_sgPKCI_vs_sgC_annotated, annot.symbol == 'ERG')
+print(head(ADAMTS1_subset))
+View(ADAMTS1_subset)
 
 ##################################################
 ## Randomizing Regions
@@ -128,21 +164,27 @@ annots_order = c(
 
 sgPKCIvs_sgC_Plot = plot_annotation(
   annotated_regions = DMRs_sgPKCI_vs_sgC_annotated,
+  annotated_random = sgPKCIvs_sgC_random_regions_annotated,
   annotation_order = annots_order,
   plot_title = '# unique DMRs in sgPKCI',
   x_label = 'knownGene Annotations',
   y_label = 'Count')
 
+png("./figs/AnnPlot_sgPKCI.png", width = 2000, height = 2000, res = 300)
 print(sgPKCIvs_sgC_Plot)
+dev.off()
 
 sgCvs_sgPKCI_Plot = plot_annotation(
   annotated_regions = DMRs_sgC_vs_sgPKCI_annotated,
+  annotated_random = sgCvs_sgPKCI_random_regions_annotated,
   annotation_order = annots_order,
   plot_title = '# unique DMRs in sgC',
   x_label = 'knownGene Annotations',
   y_label = 'Count')
 
+png("./figs/AnnPlot_sgC.png", width = 2000, height = 2000, res = 300)
 print(sgCvs_sgPKCI_Plot)
+dev.off()
 
 #############################
 ## Plotting Regions Occurring in Pairs of Annotations
@@ -162,8 +204,9 @@ sgPKCIvs_sgC_coannotations <- plot_coannotations(
   axes_label = 'Annotations',
   plot_title = 'Regions in Pairs of Annotations (sgPKCI)')
 
+png("./figs/CoAnnPlot_sgPKCI.png", width = 2000, height = 2000, res = 300)
 print(sgPKCIvs_sgC_coannotations)
-
+dev.off()
 
 sgCvs_sgPKCI_coannotations <- plot_coannotations(
   annotated_regions = DMRs_sgC_vs_sgPKCI_annotated,
@@ -171,7 +214,9 @@ sgCvs_sgPKCI_coannotations <- plot_coannotations(
   axes_label = 'Annotations',
   plot_title = 'Regions in Pairs of Annotations (sgC)')
 
+png("./figs/CoAnnPlot_sgC.png", width = 2000, height = 2000, res = 300)
 print(sgCvs_sgPKCI_coannotations)
+dev.off()
 
 ########################################
 ## Plotting Numerical Data Over Regions
