@@ -8,6 +8,7 @@ library(annotatr)
 library(bsseq)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(org.Hs.eg.db)
+
 #########
 ## Change the plotting parameters
 #getOption("Gviz.scheme")
@@ -96,7 +97,8 @@ MRs_sgPKCI_ord <- MRs_sgPKCI[order(MRs_sgPKCI$score, decreasing = T), ]
 
 # Keep the top 500
 MRs_sgPKCI_Fil <- MRs_sgPKCI_ord[1:500, ] 
-#MRs_sgPKCI_Fil <- subset(MRs_sgPKCI, score >= 10) # From 9535 to 3522
+
+#MRs_sgPKCI_Fil <- subset(MRs_sgPKCI, score >= 50) # From 9535 to 3522
 
 ### Drop unused levels in seqnames
 keep <- seqlevels(MRs_sgPKCI_Fil) %in% unique(seqnames(MRs_sgPKCI_Fil))
@@ -123,25 +125,47 @@ allChr_MRs_sgPKCI_fil <- unique(MRs_sgPKCI_Fil@seqnames@values)
 ### Distance to offSet upstream and downstream
 maxDist <- 1000
 
+## Load data and build data tracks
+
+## First, the bigwig files, converted from bedgraph files generated during peak calling by macs3
+# sgC_5mC_BigWig <- import.bw("./MACS/bigwig/sgC_treat_pileup.bw")
+# sgPKCI_5mC_BigWig <- import.bw("./MACS/bigwig/sgPKCI_treat_pileup.bw")
+# 
+# 
+# sgC_5mC_BigWig_fil <- sgC_5mC_BigWig
+# sgC_5mC_BigWig_fil <- sgC_5mC_BigWig_fil[seqnames(sgC_5mC_BigWig_fil)%in% seqnames(MRs_sgPKCI_Fil)]
+# seqlevels(sgC_5mC_BigWig_fil) <- seqlevels(sgC_5mC_BigWig_fil)[seqlevels(sgC_5mC_BigWig_fil) %in% unique(seqnames(sgC_5mC_BigWig_fil)) ]
+# 
+# sgPKCI_5mC_BigWig_fil <- sgPKCI_5mC_BigWig
+# sgPKCI_5mC_BigWig_fil <- sgPKCI_5mC_BigWig_fil[seqnames(sgPKCI_5mC_BigWig_fil)%in% seqnames(MRs_sgPKCI_Fil)]
+# seqlevels(sgPKCI_5mC_BigWig_fil) <- seqlevels(sgPKCI_5mC_BigWig_fil)[seqlevels(sgPKCI_5mC_BigWig_fil) %in% unique(seqnames(sgPKCI_5mC_BigWig_fil)) ]
+# 
+# 
+# sgC_5mC_Track <- DataTrack(range = sgC_5mC_BigWig_fil, genome = "hg19", name = "sgC5mC", fill.histogram = "blue", col.histogram = "blue", cex.sampleNames = 12, type = "histogram")
+# #sgC_input_BigWig <- DataTrack(range = sgC_input_BigWig, genome = "hg19", name = "sgCinput")
+# sgPKCI_5mC_Track <- DataTrack(range = sgPKCI_5mC_BigWig_fil, genome = "hg19", name = "sgPKCI5mC", fill.histogram = "red", col.histogram = "red", cex.sampleNames	= 12, type = "histogram")
+# #sgPKCI_input_BigWig <- DataTrack(range = sgPKCI_input_BigWig, genome = "hg19", name = "sgPKCIinput")
+
 ###########################################################################
 ### Open device
-pdf("figs/sgPKCI_Top500DMRs.pdf", width=11, height=8.5)
+pdf("figs/sgPKCI_Top500DMRs2.pdf", width=11, height=8.5)
 
 ###########################################################################
 ### Start chromosome loop
 for ( j in seq_along(allChr_MRs_sgPKCI_fil) ) {
   
   ## Set variable for chromosome of interest
-  myChr <- allChr_MRs_sgPKCI_fil[j]
+  myChr <- as.character(allChr_MRs_sgPKCI_fil[j])
   ## Create an Ideogram
   ideoTrack <- IdeogramTrack(genome = "hg19", chromosome = myChr)
   ## Get the Gene models for the chromosome
   genesTrack <- GeneRegionTrack(TxDb.Hsapiens.UCSC.hg19.knownGene,
-                                name="Transcripts", chromosome=myChr,
+                                name="Transcripts", 
+                                chromosome=myChr,
                                 fill="lightpink1", col.line="darkgreen", lwd=1.5)
   ## Add Gene symbols
   myIds <- gene(genesTrack)
-  myIds <- select(org.Hs.eg.db, keys=myIds, keytype="ENTREZID",columns = "SYMBOL")
+  myIds <- select(org.Hs.eg.db, keys=myIds, keytype="ENTREZID", columns = "SYMBOL")
   myIds <- apply(myIds, 1, function(x) paste(x[2], x[1], sep="\n") )
   symbol(genesTrack) <- myIds
   
@@ -160,17 +184,27 @@ for ( j in seq_along(allChr_MRs_sgPKCI_fil) ) {
   ## Get the regions
   sgPKCI_DMRsByChr <- MRs_sgPKCI_Fil[seqnames(MRs_sgPKCI_Fil) == myChr]
   
+  ### Drop unused levels in seqnames
+  #keep <- seqlevels(sgPKCI_DMRsByChr) %in% unique(seqnames(sgPKCI_DMRsByChr))
+  #seqlevels(sgPKCI_DMRsByChr) <- seqlevels(sgPKCI_DMRsByChr)[keep]
+  
   ## Start gene loop
   for (i in seq_along(sgPKCI_DMRsByChr)) {
      ## Define the genomic window to be plotted
      wStart <- start(sgPKCI_DMRsByChr)[i] - maxDist
      wEnd <-  end(sgPKCI_DMRsByChr)[i] + maxDist
+     
     
      ## Highlight track
-     ht <- HighlightTrack(trackList = c(trackAnnList, list(genesTrack, sgC_5mC_Track, sgPKCI_5mC_Track)),
-                         start = start(sgPKCI_DMRsByChr)[i], end = end(sgPKCI_DMRsByChr)[i],
-                         chromosome = myChr, inBackground=TRUE, genome="hg19")
-    
+     ht <- HighlightTrack(trackList = c(
+       trackAnnList, 
+       list(genesTrack, sgC_5mC_Track, sgPKCI_5mC_Track)),
+                         start = start(sgPKCI_DMRsByChr)[i], 
+                         end = end(sgPKCI_DMRsByChr)[i],
+                         chromosome = myChr,
+                         inBackground=TRUE, 
+                         genome="hg19")
+     
      ## Plot
      plotTracks(list(ideoTrack, gTrack, ht),
                add=FALSE, from=wStart, to=wEnd, chromosome=myChr, grid=TRUE,
@@ -179,7 +213,7 @@ for ( j in seq_along(allChr_MRs_sgPKCI_fil) ) {
                background.panel = rgb(0.99, 0.99, 0.01, 0.1),
                background.title = "darkblue",
                main=paste(MRs_sgPKCI_Fil$name[i], "", "Genomic Region")
-  )
+                )
     
   }
 }

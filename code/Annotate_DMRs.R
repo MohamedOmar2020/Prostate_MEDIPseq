@@ -62,6 +62,7 @@ DMRs_sgPKCI_vs_sgC_annotated <- annotate_regions(
   annotations = annotations,
   ignore.strand = TRUE,
   quiet = FALSE)
+
 # Coerce to a data.frame
 DMRs_sgPKCI_vs_sgC_annotated <- data.frame(DMRs_sgPKCI_vs_sgC_annotated)
 
@@ -71,6 +72,7 @@ DMRs_sgC_vs_sgPKCI_annotated <- annotate_regions(
   annotations = annotations,
   ignore.strand = TRUE,
   quiet = FALSE)
+
 # Coerce to a data.frame
 DMRs_sgC_vs_sgPKCI_annotated <- data.frame(DMRs_sgC_vs_sgPKCI_annotated)
 
